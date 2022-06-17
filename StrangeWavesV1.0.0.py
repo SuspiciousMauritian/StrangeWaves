@@ -254,7 +254,6 @@ raw.plot(duration=10, n_channels= 21, verbose = True, block = True, events = one
 print('preprocessing ------------------------------------')
 # automatic bad span rejection
  
-
 # Low-frequency drift filtering
 filt_raw = raw.copy().filter(l_freq=1., h_freq=None)
 
