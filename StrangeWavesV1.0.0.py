@@ -24,7 +24,7 @@ print(raw)
 print(raw.info)
 
 print('raw -----------------------------------------------')
-# second grid intervals 
+# raw_second grid intervals 
 one_sec_array_prenp = ([[0,0,0]])
 count = start_time
 relative_stamp = 0
@@ -36,7 +36,7 @@ while relative_stamp < experimental_duration:
     count = count + 1    
 one_sec_grid_line_array = np.array(one_sec_array_prenp)
 
-# highlight_Annotations
+# raw_highlight_Annotations
 event_durations = [10,
     57.14,
     10.05,
@@ -267,11 +267,24 @@ ica.fit(filt_raw)
 ica.plot_sources(filt_raw, show_scrollbars=True, block = True) # plot ICA time course
 ica.plot_components() # plot all ICA scalp topogrophy
 ica.plot_properties(filt_raw) # Print first 5 ICA properties
-ica.plot_overlay(raw, exclude = [0], title = 'sample excluding ICA000')
-ica.plot_overlay(raw, exclude = [1], title = 'sample excluding ICA001')
-ica.plot_overlay(raw, exclude = [2], title = 'sample excluding ICA002')
+ica.plot_overlay(raw, exclude = [0, 1, 2, 3, 4, 6, 10, 11, 12, 18, 19], title = 'sample excluding ICA - 0, 1, 2, 3, 4, 6, 10, 11, 12, 18, 19')
 
-# plot processed
+
+# Applying ICA
+
+ica.exclude = [0, 1, 2, 3, 4, 6, 10, 11, 12, 18, 19]
+clean_00 = raw.copy()
+ica.apply(clean_00)
+
+clean_00.plot(title = 'clean_00', show_scrollbars=True, duration=10, n_channels= 21, verbose = True, block = True, events = one_sec_grid_line_array, event_color = 'red', theme = "dark", show_options = True)
+clean_00.plot_psd(fmax=70)
+
+#ll
+
+
+
+ 
+# plot processed ##
 
 
 
@@ -326,3 +339,15 @@ ica.plot_overlay(raw, exclude = [2], title = 'sample excluding ICA002')
 # # ica.plot_components()
 # ica.plot_overlay(raw, exclude=[0], picks='eeg')
 # ica.plot_properties(raw, picks=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
+
+
+# exclusion_matrix 
+# while exclusion_matrix_stop < 1: 
+#     list_of_exclusions = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,  13, 14, 15, 16, 17, 18, 19]
+#     list_of_exclusion_lists.append(list_of_exclusions)
+#     list_of_exclusions.pop(0)
+    
+#     if iteration == 19:
+#         list_of_exclusions = list_of_exclusions.pop(iteration)
+#         iteration
+        
