@@ -10,7 +10,7 @@ class eeg:
         self.duration = duration
         
         
-        
+        ##
         # func ICA = 19 componts
         
         # ica 0 = ma ma = cross
