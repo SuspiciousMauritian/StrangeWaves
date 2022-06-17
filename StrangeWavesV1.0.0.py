@@ -284,8 +284,11 @@ clean_00.plot_psd(fmax=70)
 
 
  
-# plot processed ##
+# plot processed ###
 
+#window killed
+
+variable = 2
 
 
 
