@@ -1,3 +1,4 @@
+from asyncio import events
 from itertools import count
 import os
 from pickle import APPEND
@@ -15,7 +16,7 @@ raw = mne.io.read_raw_edf(sample, infer_types= True, preload=True, exclude =('RO
 mne.io.Raw.set_montage(raw, 'standard_1020', match_alias = True)
 length_sec = raw.__len__()
 print('length sec', length_sec)
-start_time = 346
+start_time = 459
 end_time = 3789
 experimental_duration = end_time - start_time
 
@@ -252,8 +253,7 @@ raw.plot_psd(fmax=50)
 raw.plot(duration=10, n_channels= 21, verbose = True, block = True, events = one_sec_grid_line_array, event_color = 'red', title = sample, theme = "dark", show_options = True)
 
 print('preprocessing ------------------------------------')
-# automatic bad span rejection
- 
+
 # Low-frequency drift filtering
 filt_raw = raw.copy().filter(l_freq=1., h_freq=None)
 
@@ -278,29 +278,64 @@ ica.apply(clean_00)
 clean_00.plot(title = 'clean_00', show_scrollbars=True, duration=10, n_channels= 21, verbose = True, block = True, events = one_sec_grid_line_array, event_color = 'red', theme = "dark", show_options = True)
 clean_00.plot_psd(fmax=70)
 
-#ll
+
+#Epoching
+
+def ev(event_time, event_id):
+    event_start_sample = round((start_time + event_time) * 500)
+    
+    array = [event_start_sample, 0, event_id ]
+    return array
+
+events_array = np.array([ev(10, 2), 
+                         ev(661, 2), 
+                         ev(1020, 2),
+                         ev(0, 1),
+                         ev(134.18, 1),
+                         ev(189.11, 1), 
+                         ev(214.25, 1), 
+                         ev(240.06, 1),
+                         ev(310.29, 1),
+                         ev(381.19, 1),
+                         ev(405.04, 1),
+                         ev(475.26, 1),
+                         ev(542.16, 1),
+                         ev(567.29, 1),
+                         ev(580.12, 1),
+                         ev(651.07, 1),
+                         ev(717.24, 1), 
+                         ev(749.1, 1), 
+                         ev(761.19, 1),
+                         ev(832.21, 1),
+                         ev(899.2, 1),
+                         ev(926.09, 1),
+                         ev(1009.28, 1),
+                         ev(1107.08, 1),
+                         ev(1132.11, 1),
+                         ev(1156.19, 1),
+                         ])
+
+
+event_dict = {'tuning_fork': 1, 'Scilence': 2}
+
+frontal_picks = ['Fp1', 'Fp2']
+
+epochs = mne.Epochs(clean_00, events_array, tmin=-0.3, tmax=10,)
+epochs.event_id = event_dict
+epochs.plot(block = True)
+
+# Plot mean across epochs 
+for i in raw.info['ch_names']:
+    epochs['tuning_fork'].plot_image(combine='mean', picks = i )
+
+for i in raw.info['ch_names']:
+    epochs['Scilence'].plot_image(combine='mean', picks = i )
 
 
 
- 
-# plot processed ###
-
-#window killed
-
-variable = 2
 
 
 
-
-
-
-
-
-
-
-# raw plot
-# raw.plot_psd(fmax=50)
-# filt_raw.plot(duration=10, n_channels= 21, verbose = True, block = True, events = one_sec_grid_line_array, event_color = 'red', title = sample, theme = "dark", show_options = True)
 
 
 
@@ -309,6 +344,10 @@ variable = 2
 
 
 # CODE BASE
+
+# raw plot
+# raw.plot_psd(fmax=50)
+# filt_raw.plot(duration=10, n_channels= 21, verbose = True, block = True, events = one_sec_grid_line_array, event_color = 'red', title = sample, theme = "dark", show_options = True)
 
 # #data_selection
 # sampling_freq = raw.info['sfreq']
@@ -341,7 +380,6 @@ variable = 2
 # # ica.plot_components()
 # ica.plot_overlay(raw, exclude=[0], picks='eeg')
 # ica.plot_properties(raw, picks=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
-
 
 # exclusion_matrix 
 # while exclusion_matrix_stop < 1: 
