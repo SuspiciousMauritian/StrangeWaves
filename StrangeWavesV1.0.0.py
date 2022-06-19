@@ -249,8 +249,8 @@ raw = raw.set_annotations(all_annotations)
 raw.crop(tmin = start_time, tmax = end_time)
 
 # raw plot
-raw.plot_psd(fmax=50)
-raw.plot(duration=10, n_channels= 21, verbose = True, block = True, events = one_sec_grid_line_array, event_color = 'red', title = sample, theme = "dark", show_options = True)
+# raw.plot_psd(fmax=50)
+# raw.plot(duration=10, n_channels= 21, verbose = True, block = True, events = one_sec_grid_line_array, event_color = 'red', title = sample, theme = "dark", show_options = True)
 
 print('preprocessing ------------------------------------')
 
@@ -266,17 +266,17 @@ ica.fit(filt_raw)
 ica.plot_sources(filt_raw, show_scrollbars=True, block = True) # plot ICA time course
 ica.plot_components() # plot all ICA scalp topogrophy
 ica.plot_properties(filt_raw) # Print first 5 ICA properties
-ica.plot_overlay(raw, exclude = [0, 1, 2, 3, 4, 6, 10, 11, 12, 18, 19], title = 'sample excluding ICA - 0, 1, 2, 3, 4, 6, 10, 11, 12, 18, 19')
+ica.plot_overlay(raw, exclude = [0, 1], title = 'sample excluding ICA - 0, 1')
 
 
 # Applying ICA
 
-ica.exclude = [0, 1, 2, 3, 4, 6, 10, 11, 12, 18, 19]
+ica.exclude = [0, 1]
 clean_00 = raw.copy()
 ica.apply(clean_00)
 
-clean_00.plot(title = 'clean_00', show_scrollbars=True, duration=10, n_channels= 21, verbose = True, block = True, events = one_sec_grid_line_array, event_color = 'red', theme = "dark", show_options = True)
-clean_00.plot_psd(fmax=70)
+# clean_00.plot(title = 'clean_00', show_scrollbars=True, duration=10, n_channels= 21, verbose = True, block = True, events = one_sec_grid_line_array, event_color = 'red', theme = "dark", show_options = True)
+# clean_00.plot_psd(fmax=70)
 
 
 #Epoching
@@ -308,35 +308,43 @@ events_array = np.array([ev(10, 2),
                          ev(761.19, 1),
                          ev(832.21, 1),
                          ev(899.2, 1),
-                         ev(926.09, 1),
                          ev(1009.28, 1),
                          ev(1107.08, 1),
                          ev(1132.11, 1),
                          ev(1156.19, 1),
+                         ev(175.22, 4),
+                         ev(177.12, 4),
+                         ev(178.21, 4),
+                         ev(180.07, 4),
+                         ev(181.21, 4),
+                         ev(183.05, 4),
+                         ev(184.17, 4),
+                         ev(186.02, 4),
+                         ev(187.14, 4),
+                         
                          ])
 
-
-event_dict = {'tuning_fork': 1, 'Scilence': 2}
+event_dict = {'tuning_fork': 1, 
+              'Scilence': 2, 
+              'white_noise': 3, 
+              'clarinet_notes': 4, 
+              'flute_notes': 5, 
+              'trumpet_notes': 6,
+            }
 
 frontal_picks = ['Fp1', 'Fp2']
 
-epochs = mne.Epochs(clean_00, events_array, tmin=-0.3, tmax=10,)
+epochs = mne.Epochs(clean_00, events_array, tmin=-0.2, tmax=1,)
 epochs.event_id = event_dict
-epochs.plot(block = True)
+# epochs.plot(block = True)
 
 # Plot mean across epochs 
-for i in raw.info['ch_names']:
-    epochs['tuning_fork'].plot_image(combine='mean', picks = i )
-
-for i in raw.info['ch_names']:
-    epochs['Scilence'].plot_image(combine='mean', picks = i )
+# for i in raw.info['ch_names']:
+epochs['clarinet_notes'].plot_image(combine='mean')
 
 
-
-
-
-
-
+evoked = epochs['clarinet_notes'].average()
+evoked.plot_joint()
 
 
 
