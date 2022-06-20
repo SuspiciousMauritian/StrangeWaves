@@ -258,15 +258,15 @@ print('preprocessing ------------------------------------')
 filt_raw = raw.copy().filter(l_freq=1., h_freq=None)
 
 #Power spectral analysis
-filt_raw.plot_psd(fmax=70) #plot PSD
+# filt_raw.plot_psd(fmax=70) #plot PSD
 
 # Independent component analysis 
 ica = mne.preprocessing.ICA(n_components=20, random_state=97, max_iter=1000)
 ica.fit(filt_raw) 
-ica.plot_sources(filt_raw, show_scrollbars=True, block = True) # plot ICA time course
-ica.plot_components() # plot all ICA scalp topogrophy
-ica.plot_properties(filt_raw) # Print first 5 ICA properties
-ica.plot_overlay(raw, exclude = [0, 1], title = 'sample excluding ICA - 0, 1')
+# ica.plot_sources(filt_raw, show_scrollbars=True, block = True) # plot ICA time course
+# ica.plot_components() # plot all ICA scalp topogrophy
+# ica.plot_properties(filt_raw) # Print first 5 ICA properties
+# ica.plot_overlay(raw, exclude = [0, 1], title = 'sample excluding ICA - 0, 1')
 
 
 # Applying ICA
@@ -286,7 +286,6 @@ def ev(event_time, event_id):
     
     array = [event_start_sample, 0, event_id ]
     return array
-
 events_array = np.array([ev(10, 2), 
                          ev(661, 2), 
                          ev(1020, 2),
@@ -332,19 +331,29 @@ event_dict = {'tuning_fork': 1,
               'trumpet_notes': 6,
             }
 
-frontal_picks = ['Fp1', 'Fp2']
+location_index = [['Fp1', 'Fp2'] , ['T4', 'T3']]
 
-epochs = mne.Epochs(clean_00, events_array, tmin=-0.2, tmax=1,)
+epochs = mne.Epochs(clean_00, events_array, tmin=-0.2, tmax=0.06,)
 epochs.event_id = event_dict
 # epochs.plot(block = True)
 
 # Plot mean across epochs 
+
 # for i in raw.info['ch_names']:
-epochs['clarinet_notes'].plot_image(combine='mean')
+epochs['clarinet_notes'].plot_image(combine='std', 
+                                    picks = location_index[1],
+                                    sigma = 2,
+                                    vmin = -20,
+                                    vmax = 20,
+                                    evoked = True
+                                    )
 
 
-evoked = epochs['clarinet_notes'].average()
-evoked.plot_joint()
+evoked = epochs['clarinet_notes'].average(['T4', 'T3'])
+
+evoked.plot()
+
+# evoked.plot_joint()
 
 
 
